@@ -34,9 +34,9 @@ namespace SecondReality
 
             graphics = new GraphicsDeviceManager(this);
 
-            graphics.IsFullScreen = false; //true;
-            graphics.PreferredBackBufferWidth = 1280; //640; //1280;
-            graphics.PreferredBackBufferHeight = 720; //320;// 720;
+            graphics.IsFullScreen = true; //true;
+            graphics.PreferredBackBufferWidth = 640; //1280;
+            graphics.PreferredBackBufferHeight = 320;// 720;
 
             graphics.PreferMultiSampling = true;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
@@ -53,37 +53,43 @@ namespace SecondReality
         {
             return new Type[] 
             {
+                
                 typeof(Intro),
+              
                 typeof(Title),
                 typeof(Twilight),
                 typeof(Rarity),
+
 //#if !SURFACE_RT 
                 typeof(Vinyl), // too big textures generated for surface rt 1gen
 //#endif
+
                 typeof(GetDown),
                 typeof(Rainbow),
                 typeof(EndFirstHalf),
                 typeof(Fluttershy),
+
 //#if !SURFACE_RT
                 typeof(Applejack), // HRESULT: 0x887A0005 with surface rt 1gen
 //#endif
+
                 typeof(Cmc),
                 typeof(Cube),
                 typeof(Pinkie),
                 typeof(Derpy),
-// Test: if failed then remark it
+                
+// TEST: if failed then remark it
 typeof(Waves), //<--- looks like a bug in SharpDX/Monogame, crashy crashy with this scene
                 typeof(EndSecondHalf),
                 typeof(WorldStart),
                 typeof(World),
-                typeof(Thanks),
-                typeof(Credits),
+                typeof(Thanks),               
+                typeof(Credits),                
                 typeof(End)
             };
         }
 
-
-
+        
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -141,8 +147,8 @@ typeof(Waves), //<--- looks like a bug in SharpDX/Monogame, crashy crashy with t
             //If the segment reported IsComplete, move on to the next one immediately (not next frame, now)
             
             // my hack :)
-            if (currentSegment != null)
-            {
+            //if (currentSegment != null)
+            //{
                 if (currentSegment.IsComplete(span))
                 {
                     ResetViewport();
@@ -155,12 +161,12 @@ typeof(Waves), //<--- looks like a bug in SharpDX/Monogame, crashy crashy with t
                     SegmentStartTime = VideoMode ? GetTimespan(FrameNumber, VideoFrameRate) : gameTime.TotalGameTime;
                     span = TimeSpan.Zero;
                 }
-            }
-            else
-            {
+            //}
+            //else
+            //{
                 //my hack too :)
-                return;
-            }
+            //    return;
+            //}
 
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 

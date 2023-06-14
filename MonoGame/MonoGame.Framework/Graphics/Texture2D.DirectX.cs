@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using System.Threading.Tasks;
+using System.Diagnostics;
 #endif
 
 namespace Microsoft.Xna.Framework.Graphics
@@ -38,16 +39,20 @@ namespace Microsoft.Xna.Framework.Graphics
             GetTexture();
         }
 
-        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+
+        private void PlatformSetData<T>(int level, int arraySlice, Rectangle? rect,
+            T[] data, int startIndex, int elementCount) where T : struct
         {
             var elementSizeInByte = Marshal.SizeOf(typeof(T));
             var dataHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+
             // Use try..finally to make sure dataHandle is freed in case of an error
             try
             {
                 var startBytes = startIndex * elementSizeInByte;
                 var dataPtr = (IntPtr)(dataHandle.AddrOfPinnedObject().ToInt64() + startBytes);
                 int x, y, w, h;
+
                 if (rect.HasValue)
                 {
                     x = rect.Value.X;
@@ -92,27 +97,90 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 // TODO: We need to deal with threaded contexts here!
                 int subresourceIndex = CalculateSubresourceIndex(arraySlice, level);
-                var d3dContext = GraphicsDevice._d3dContext;
-                lock (d3dContext)
-                    d3dContext.UpdateSubresource(box, GetTexture(), subresourceIndex, region);
+                
+                //-----------------------------------------------------------------------------------
+
+                // Create a temp staging resource for copying the data.
+                // 
+                // TODO: We should probably be pooling these staging resources
+                // and not creating a new one each time.
+                //
+                int levelWidth = Math.Max(width >> level, 1);
+                int levelHeight = Math.Max(height >> level, 1);
+
+
+                SharpDX.Direct3D11.Texture2DDescription desc =
+                    new SharpDX.Direct3D11.Texture2DDescription();
+
+                desc.Width = levelWidth;
+                desc.Height = levelHeight;
+                desc.MipLevels = 1;
+                desc.ArraySize = 1;
+                desc.Format = SharpDXHelper.ToFormat(_format);
+                desc.BindFlags = SharpDX.Direct3D11.BindFlags.None;
+                desc.CpuAccessFlags = SharpDX.Direct3D11.CpuAccessFlags.Read;
+                desc.SampleDescription.Count = 1;
+                desc.SampleDescription.Quality = 0;
+                desc.Usage = SharpDX.Direct3D11.ResourceUsage.Staging;
+                desc.OptionFlags = SharpDX.Direct3D11.ResourceOptionFlags.None;
+
+                // ** Experimental **
+
+                using (var stagingTex = new SharpDX.Direct3D11.Texture2D(GraphicsDevice._d3dDevice, desc))
+                {
+                    SharpDX.Direct3D11.DeviceContext d3dContext = GraphicsDevice._d3dContext;
+                    //try
+                    //{
+                    lock (d3dContext)
+                    {
+                        SharpDX.Direct3D11.Resource t = GetTexture();
+
+                        try
+                        {
+                            //RnD
+                            d3dContext.UpdateSubresource(box, t,
+                                subresourceIndex, region);
+                        }
+                        catch (Exception ex1)
+                        {
+                            Debug.WriteLine("[ex1] Texture2D - d3dContext.UpdateSubresource bug: "
+                                + ex1.Message);
+                        }
+                    }//lock
+
+                    //}
+                    //catch (Exception ex)
+                    //
+                    //    Debug.WriteLine("[ex] Texture2D - Lock error: " + ex.Message);
+                    //}
+                    //}
+                    //finally
+                    //{
+                    //dataHandle.Free();
+                    //}
+                }//using
             }
             finally
             {
                 dataHandle.Free();
             }
-        }
+        }//void
 
-        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, T[] data, int startIndex, int elementCount) where T : struct
+
+        private void PlatformGetData<T>(int level, int arraySlice, Rectangle? rect, 
+            T[] data, int startIndex, int elementCount) where T : struct
         {
             // Create a temp staging resource for copying the data.
             // 
             // TODO: We should probably be pooling these staging resources
             // and not creating a new one each time.
             //
-            var levelWidth = Math.Max(width >> level, 1);
-            var levelHeight = Math.Max(height >> level, 1);
+            int levelWidth = Math.Max(width >> level, 1);
+            int levelHeight = Math.Max(height >> level, 1);
 
-            var desc = new SharpDX.Direct3D11.Texture2DDescription();
+            SharpDX.Direct3D11.Texture2DDescription desc = 
+                new SharpDX.Direct3D11.Texture2DDescription();
+
             desc.Width = levelWidth;
             desc.Height = levelHeight;
             desc.MipLevels = 1;
@@ -168,7 +236,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             for (var row = 0; row < rows; row++)
                             {
                                 int i;
-                                for (i = row * rowSize / elementSizeInByte; i < (row + 1) * rowSize / elementSizeInByte; i++)
+                                for (i = row * rowSize / elementSizeInByte; 
+                                      i < (row + 1) * rowSize / elementSizeInByte; i++)
                                     data[i] = stream.Read<T>();
 
                                 if (i >= elementCount)
