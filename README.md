@@ -29,6 +29,9 @@ Original project is here: https://github.com/erikmooney/SecondRealipony
 - Find and download MonoGame3_6_Setup.exe (from offical monogame.net site , etc.) 
 and install it *before* the secondreality building.
 
+## Reference(s)
+- https://github.com/noxo/SecondRealityponyWinRT
+
 ## ..
 As is. No support. RnD only. DIY
 
