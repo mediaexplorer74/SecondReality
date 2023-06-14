@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace SecondReality
 {
@@ -96,7 +97,15 @@ namespace SecondReality
                     var direction = Vector3.Normalize(worldPointB - worldPointA);
                     var firstRay = new Ray(worldPointA, direction);
                     Color color = TraceRay(firstRay, -1);
-                    colors[v * device.Viewport.Width + u] = color;
+
+                    try
+                    {
+                        colors[v * device.Viewport.Width + u] = color;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("[ex] Derpy - Color acc. bug:" + ex.Message);
+                    }
                 }
 
             prerender = new Texture2D(device, device.Viewport.Width, device.Viewport.Height);

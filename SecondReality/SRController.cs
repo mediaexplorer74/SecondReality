@@ -33,9 +33,10 @@ namespace SecondReality
         {
 
             graphics = new GraphicsDeviceManager(this);
-            graphics.IsFullScreen = true;
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+
+            graphics.IsFullScreen = false; //true;
+            graphics.PreferredBackBufferWidth = 1280; //640; //1280;
+            graphics.PreferredBackBufferHeight = 720; //320;// 720;
 
             graphics.PreferMultiSampling = true;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
@@ -50,26 +51,28 @@ namespace SecondReality
 
         public Type[] GetStandardSegmentOrder()
         {
-            return new Type[] {
+            return new Type[] 
+            {
                 typeof(Intro),
                 typeof(Title),
                 typeof(Twilight),
                 typeof(Rarity),
-#if !SURFACE_RT 
+//#if !SURFACE_RT 
                 typeof(Vinyl), // too big textures generated for surface rt 1gen
-#endif
+//#endif
                 typeof(GetDown),
                 typeof(Rainbow),
                 typeof(EndFirstHalf),
                 typeof(Fluttershy),
-#if !SURFACE_RT
+//#if !SURFACE_RT
                 typeof(Applejack), // HRESULT: 0x887A0005 with surface rt 1gen
-#endif
+//#endif
                 typeof(Cmc),
                 typeof(Cube),
                 typeof(Pinkie),
                 typeof(Derpy),
-//                typeof(Waves), <--- looks like a bug in SharpDX/Monogame, crashy crashy with this scene
+// Test: if failed then remark it
+typeof(Waves), //<--- looks like a bug in SharpDX/Monogame, crashy crashy with this scene
                 typeof(EndSecondHalf),
                 typeof(WorldStart),
                 typeof(World),
@@ -136,17 +139,27 @@ namespace SecondReality
 
             //Rules for timing: Each segment reports that it has completed on the first frame that is past its stated end time.
             //If the segment reported IsComplete, move on to the next one immediately (not next frame, now)
-            if (currentSegment.IsComplete(span))
+            
+            // my hack :)
+            if (currentSegment != null)
             {
-                ResetViewport();
-                SegmentNumber++;
-                if (currentSegment == null)
+                if (currentSegment.IsComplete(span))
                 {
-                    this.Exit();
-                    return;
+                    ResetViewport();
+                    SegmentNumber++;
+                    if (currentSegment == null)
+                    {
+                        this.Exit();
+                        return;
+                    }
+                    SegmentStartTime = VideoMode ? GetTimespan(FrameNumber, VideoFrameRate) : gameTime.TotalGameTime;
+                    span = TimeSpan.Zero;
                 }
-                SegmentStartTime = VideoMode ? GetTimespan(FrameNumber, VideoFrameRate) : gameTime.TotalGameTime;
-                span = TimeSpan.Zero;
+            }
+            else
+            {
+                //my hack too :)
+                return;
             }
 
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
