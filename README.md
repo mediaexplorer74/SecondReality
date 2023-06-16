@@ -1,4 +1,4 @@
-# SecondReality ("Realipony" codename)
+# SecondReality v1.0.2 ("Realipony" codename)
 
 I started research as my small experiment of running Eric Mooneys' remake of Second Reality 
 [WinRT edition](https://github.com/noxo/SecondRealityponyWinRT)... and, in result, 
@@ -13,18 +13,22 @@ of Second Reality is [c]oolest [d]emoscene deal !
 ![W10M](Images/shot3.png)
 
 ## GameTech I used
-- I "assembled" (prepared) and used my own "UAP 15063-compatible" Monogame (& SharpDX) "framework" as "graphics backend". 
-- XNA Content is "included" (precompiled) with project! 
+- I "assembled" (prepared) and used my own "UAP 10240" (Astoria-compatible) Monogame (& SharpDX) "framework" as "graphics backend". 
+- XNA Content is "included" (precompiled) with project.
 
 
-## Main changes / Progress (+/-)
+## Main changes / My progress 
 - Microsoft.XNA framework -> Monogame XNA framework +
 - Xna.VideoPlayer -> Windows.UI.Xaml.Controls.MediaElement + 
 - Monogame XNA Content Pipeline fight - not needed :)
 - System.Threading.Thread -> System.Threading.Tasks.Task +
-- Min. Win. OS build (SDK) = 15063
+- Min. Win. OS build (SDK) = 10240
+- Content decreased a little (because of huge size)
 - Tested targets: x64, ARM32
 
+## Potential hardware/os/software problems/bugs
+- If you will use very old PC/notebook without DX11 support, then last 3D scene will be empty (black screen).
+- If you will use Lumia phone (950/950XL) and Win10Mobile, then some system UI drawing bugs/freezes will accur on SecondReality exiting.
 
 ## How to build the code / assemble this solution
 - Should compile nicely with Visual Studio 2022 Preview Community for Windows 10/11. 

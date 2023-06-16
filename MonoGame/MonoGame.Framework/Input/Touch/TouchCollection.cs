@@ -120,7 +120,15 @@ namespace Microsoft.Xna.Framework.Input.Touch
         {
             get
             {
-                return Collection[index];
+                TouchLocation t = default;
+
+                // check *no touchpanel* case
+                if (Collection.Length > 0)
+                {
+                   t = Collection[index];                   
+                }
+
+                return t;//Collection[index];
             }
             set
             {

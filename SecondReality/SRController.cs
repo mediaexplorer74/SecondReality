@@ -34,9 +34,11 @@ namespace SecondReality
 
             graphics = new GraphicsDeviceManager(this);
 
-            graphics.IsFullScreen = true; //true;
-            graphics.PreferredBackBufferWidth = 640; //1280;
-            graphics.PreferredBackBufferHeight = 320;// 720;
+            // if planning to run on Desktop PC, prefer to use non-fulscreen (windowed) mode
+            // if planning to run on Mobile device, prefer to use fullscreen mode
+            graphics.IsFullScreen = false; //true;
+            graphics.PreferredBackBufferWidth = 320; // 640 / 1280
+            graphics.PreferredBackBufferHeight = 160; // 320 / 720
 
             graphics.PreferMultiSampling = true;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
@@ -60,24 +62,22 @@ namespace SecondReality
                 typeof(Twilight),
                 typeof(Rarity),
 
-//#if !SURFACE_RT 
+                //#if !SURFACE_RT 
                 typeof(Vinyl), // too big textures generated for surface rt 1gen
-//#endif
 
                 typeof(GetDown),
                 typeof(Rainbow),
                 typeof(EndFirstHalf),
                 typeof(Fluttershy),
 
-//#if !SURFACE_RT
+                //#if !SURFACE_RT
                 typeof(Applejack), // HRESULT: 0x887A0005 with surface rt 1gen
-//#endif
 
                 typeof(Cmc),
                 typeof(Cube),
                 typeof(Pinkie),
                 typeof(Derpy),
-                
+               
 // TEST: if failed then remark it
 typeof(Waves), //<--- looks like a bug in SharpDX/Monogame, crashy crashy with this scene
                 typeof(EndSecondHalf),
@@ -147,33 +147,40 @@ typeof(Waves), //<--- looks like a bug in SharpDX/Monogame, crashy crashy with t
             //If the segment reported IsComplete, move on to the next one immediately (not next frame, now)
             
             // my hack :)
-            //if (currentSegment != null)
-            //{
+            if (currentSegment != null)
+            {
+                // PLAN A - game-segment is not null yet...
                 if (currentSegment.IsComplete(span))
                 {
                     ResetViewport();
                     SegmentNumber++;
                     if (currentSegment == null)
                     {
+                        // wow, game segment is null? ok, try to exit normally :)
                         this.Exit();
                         return;
                     }
-                    SegmentStartTime = VideoMode ? GetTimespan(FrameNumber, VideoFrameRate) : gameTime.TotalGameTime;
+                    SegmentStartTime = VideoMode 
+                        ? GetTimespan(FrameNumber, VideoFrameRate) 
+                        : gameTime.TotalGameTime;
                     span = TimeSpan.Zero;
                 }
-            //}
-            //else
-            //{
-                //my hack too :)
-            //    return;
-            //}
+            }
+            else
+            {
+                //PLAN B - try exit somewhere somehow, if game-segment damaged !
+                this.Exit();
+                return;
+            }
 
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
             // Ask current segment if it is ready (done with any precalculating).  If not, wait.
             if (!currentSegment.IsReady)
             {
-                SegmentStartTime = VideoMode ? GetTimespan(FrameNumber, VideoFrameRate) : gameTime.TotalGameTime;
+                SegmentStartTime = VideoMode 
+                    ? GetTimespan(FrameNumber, VideoFrameRate) 
+                    : gameTime.TotalGameTime;
                 return;
             }
 

@@ -81,7 +81,8 @@ namespace SecondReality
 
         private void CreatePrerender()
         {
-            var colors = new Color[device.Viewport.Width * device.Viewport.Height];
+            //RnD : * 1--> * 4
+            Color[] colors = new Color[device.Viewport.Width * device.Viewport.Height * 4];
 
             SetBasicEffect();   //Need the view and projection matrices
 
@@ -104,7 +105,7 @@ namespace SecondReality
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("[ex] Derpy - Color acc. bug:" + ex.Message);
+                        //Debug.WriteLine("[ex] Derpy - Color acc. bug:" + ex.Message);
                     }
                 }
 

@@ -124,7 +124,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 bool retry = false;
                 for (int i = 0; i < inputElements.Length; i++)
                 {
-                    if (inputElements[i].SemanticIndex == 0 && inputElements[i].SemanticName.Equals("POSITION", StringComparison.OrdinalIgnoreCase))
+                    if (inputElements[i].SemanticIndex == 0 
+                        && inputElements[i].SemanticName.Equals("POSITION", 
+                                                  StringComparison.OrdinalIgnoreCase))
                     {
                         inputElements[i].SemanticName = "SV_Position";
                         retry = true;
@@ -137,7 +139,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
                 try
                 {
-                    inputLayout = new InputLayout(_graphicsDevice._d3dDevice, _shaderByteCode, inputElements);
+                    inputLayout = new InputLayout(_graphicsDevice._d3dDevice, 
+                        _shaderByteCode, 
+                        inputElements);
 
                     // Workaround succeeded? This means that there is a vertex shader that needs
                     // to be updated.
@@ -153,11 +157,11 @@ namespace Microsoft.Xna.Framework.Graphics
                     }
 #endif
                 }
-                catch (Exception ex1)//(SharpDXException)
+                catch (SharpDXException ex1)//(SharpDXException)
                 {
                     // Workaround failed.
                     //throw new InvalidOperationException(GetInvalidArgMessage(inputElements), ex);
-                    Debug.WriteLine("[ex] inputElements error:", ex1.Message);
+                    Debug.WriteLine("[ex] inputElements error:", ex1.StackTrace.ToString());
                 }
             }
 
