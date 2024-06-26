@@ -7,10 +7,9 @@ I assembled this fun UWP app... ;)
 The goal was Win10/11 Desktop-compatible UWP app (and even W10M-compatible app), because of Second Reality is [c]oolest [d]emoscene !
 
 ## Screenshots
-![W11](Images/shot01.png)
-![W11](Images/shot02.png)
-![W11](Images/shot03.png)
-![W10M](Images/shot04.png)
+![W11](Images/shot1.png)
+![W11](Images/shot2.png)
+![L640 Astoria](Images/shot3.png)
 
 ## GameTech I used
 - I decided to use firm Monogame 3.8 engine as "game graphic renderer". 
